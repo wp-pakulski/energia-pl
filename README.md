@@ -5,7 +5,7 @@
 
 Pytania pomocnicze:
 1. Jak cena zmienia się w cyklu dobowym, tygodniowym i sezonowym?
-2. **Jak udział wiatru i fotowoltaiki w generacji wpływa na cenę?** ← najciekawszy wątek
+2. **Jak udział wiatru i fotowoltaiki w generacji wpływa na cenę?**
 3. Ile realnie da się zaoszczędzić przy przesunięciu X% zużycia na najtańsze godziny?
 
 **RCE to rynkowa cena rozliczeniowa, a nie cena z faktury odbiorcy.** Firma płaci taryfę
