@@ -1,0 +1,3 @@
+# Testowane na: pandas 3.0.2, requests 2.33.1, Python 3.14
+pandas>=2.2
+requests>=2.31
