@@ -1,4 +1,4 @@
-"""Fetch RCE day-ahead prices from the PSE API and store them in data/raw/."""
+"""Fetch PSE API data (prices, generation, demand) and store it in data/raw/."""
 
 import pandas as pd
 import requests
@@ -6,14 +6,15 @@ from pathlib import Path
 
 BASE_URL = "https://api.raporty.pse.pl/api/"
 PROJECT_DIR = Path(__file__).resolve().parent.parent
-CSV_PATH = PROJECT_DIR / "data" / "raw" / "rce_pln.csv"
+PRICES_CSV_PATH = PROJECT_DIR / "data" / "raw" / "rce_pln.csv"
+GEN_CSV_PATH = PROJECT_DIR / "data" / "raw" / "his_wlk_cal.csv"
 PAGE_SIZE = 5000
 RECORDS_PER_DAY = 96
 
 
-def fetch_range(date_from, date_to):
-    """Fetch rce-pln records for a date range, following pagination."""
-    url = f"{BASE_URL}rce-pln"
+def fetch_range(endpoint, date_from, date_to):
+    """Fetch records from one PSE endpoint for a date range, following pagination."""
+    url = f"{BASE_URL}{endpoint}"
     params = {"$filter": f"business_date ge '{date_from}' and business_date le '{date_to}'",
               "$first": PAGE_SIZE}
     records = []
@@ -47,18 +48,30 @@ def check_completeness(df):
     print(f"Duplicated quarter-hours: {duplicates}")
 
 
-if __name__ == "__main__":
+def download(endpoint, csv_path, date_from, date_to):
+    """Fetch one source month by month, save it to CSV and report completeness.
+
+    Monthly chunks keep the number of requests low (~26 for two years) while a
+    failed request costs one month, not the whole range. Returns the DataFrame
+    so callers can use the data without reading the file back.
+    """
     all_records = []
 
-    for month_start in pd.date_range("2026-06-01", "2026-07-01", freq="MS"):
+    for month_start in pd.date_range(date_from, date_to, freq="MS"):
         month_end = month_start + pd.offsets.MonthEnd(0)
-        all_records.extend(fetch_range(month_start.strftime("%Y-%m-%d"),
+        all_records.extend(fetch_range(endpoint, month_start.strftime("%Y-%m-%d"),
                                        month_end.strftime("%Y-%m-%d")))
-        print(month_start.strftime("%Y-%m"), len(all_records))
+        print(f"[{endpoint}] {month_start:%Y-%m} {len(all_records)}")
 
     df = pd.DataFrame(all_records)
-    df.to_csv(CSV_PATH, index=False)
-    print("rows written:", len(df))
-    print("rows read back:", len(pd.read_csv(CSV_PATH)))
+    df.to_csv(csv_path, index=False)
+    print(f"[{endpoint}] rows written: {len(df)}")
+    print(f"[{endpoint}] rows read back: {len(pd.read_csv(csv_path))}")
 
     check_completeness(df)
+    return df
+
+
+if __name__ == "__main__":
+    download("rce-pln", PRICES_CSV_PATH, "2026-06-01", "2026-07-01")
+    download("his-wlk-cal", GEN_CSV_PATH, "2026-06-01", "2026-07-01")
