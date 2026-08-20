@@ -73,5 +73,5 @@ def download(endpoint, csv_path, date_from, date_to):
 
 
 if __name__ == "__main__":
-    download("rce-pln", PRICES_CSV_PATH, "2026-06-01", "2026-07-01")
-    download("his-wlk-cal", GEN_CSV_PATH, "2026-06-01", "2026-07-01")
+    download("rce-pln", PRICES_CSV_PATH, "2024-06-01", "2026-08-20")
+    download("his-wlk-cal", GEN_CSV_PATH, "2024-06-01", "2026-08-20")

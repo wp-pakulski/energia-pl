@@ -10,6 +10,7 @@ PROCESSED_CSV_PATH = PROJECT_DIR / "data" / "processed" / "energia_pl.csv"
 
 # Only these 5 of the 24 his-wlk-cal columns. The rest stays untouched in data/raw/.
 GEN_COLUMNS = ["business_date", "period", "pv", "wi", "demand"]
+GEN_VALUE_COLUMNS = ["pv", "wi", "demand"]
 
 
 def merge_sources(prices, generation):
@@ -46,15 +47,33 @@ def add_res_share(df):
     return df
 
 
+def drop_incomplete_days(df):
+    """Drop whole days whose generation data is not fully published yet.
+
+    PSE publishes RCE prices a day ahead but reports generation with a lag, so the
+    current day always arrives partly filled. Dropping only the empty rows would
+    leave a short day behind and bias every daily aggregate downwards, without
+    raising any error. The cut-off is derived from the data, never hardcoded, so
+    a scheduled refresh stays correct whenever PSE publishes late.
+    """
+    incomplete = df.loc[df[GEN_VALUE_COLUMNS].isna().any(axis=1), "business_date"].unique()
+    kept = df[~df["business_date"].isin(incomplete)].copy()
+
+    print(f"incomplete days dropped: {len(incomplete)} ({len(df) - len(kept)} rows)")
+    return kept
+
+
 def main():
     prices = pd.read_csv(PRICES_CSV_PATH)
     generation = pd.read_csv(GEN_CSV_PATH, usecols=GEN_COLUMNS)
     print(f"loaded: prices {len(prices)}, generation {len(generation)}")
 
     df = merge_sources(prices, generation)
+    print(f"unmatched: prices {len(prices) - len(df)}, generation {len(generation) - len(df)}")
     df = add_hour(df)
     df = add_calendar_columns(df)
     df = add_res_share(df)
+    df = drop_incomplete_days(df)
 
     df.to_csv(PROCESSED_CSV_PATH, index=False)
     print(f"rows written: {len(df)}")
