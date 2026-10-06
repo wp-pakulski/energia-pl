@@ -57,8 +57,9 @@ udziału dotyczą **42,4% kwadransów**, czyli niemal co drugiego.
 
 ![Udział cen ujemnych wg udziału OZE](reports/png/oze_ceny_ujemne.png)
 
-*Trzy pierwsze koszyki są zerowe - poniżej 30% udziału OZE ceny ujemne po prostu się nie
-zdarzają. Spadek w koszyku 80-90% jest realny, ale opiera się na 75 kwadransach z 76 512.*
+*Trzy pierwsze koszyki są praktycznie zerowe (6 kwadransów, 0,01%) - poniżej 30% udziału
+OZE ceny ujemne niemal się nie zdarzają. Spadek w koszyku 80-90% jest realny, ale opiera
+się na 75 kwadransach z 76 512.*
 
 **4. Zależność OZE-cena przeżywa kontrolę na porę dnia - i wzmacnia się.**
 Udział OZE jest silnie związany z porą dnia (korelacja profili godzinowych **−0,725**),
@@ -138,7 +139,7 @@ podniósł się ogólny poziom cen. **Rośnie kwota oszczędności, nie jej udzi
    udział OZE = (pv + wi) / demand
 4. **Profil dobowy** liczony medianą i średnią równolegle, z kontrolą skośności przez różnicę
    obu miar w każdej godzinie
-5. **Kontrola sezonowa** hipotezy o pogłębianiu doliny na dwóch niezależnych oknach
+5. **Kontrola sezonowa** hipotezy o pogłębianiu doliny na dwóch oknach
    kalendarzowych (67 dni × 3 lata oraz 231 dni × 2 lata)
 6. **Kontrola zmiennej zakłócającej** przy zależności OZE-cena: porównanie wewnątrz stałej
    pory dnia, w tym test nocny izolujący sam wiatr (mediana PV w godzinach 0-4 wynosi 0 MW)
@@ -204,6 +205,9 @@ jest ustawiony na końcu `import_data.py`.
 - **Model zakłada pełną elastyczność** przesuwanej części zużycia - przeniesienie w dowolny
   kwadrans doby bez kosztu i bez strat. Realny odbiorca ma ograniczenia technologiczne,
   a najtańsze kwadranse bywają rozrzucone po dobie zamiast tworzyć jeden ciągły blok.
+- **Model zakłada płaski profil dobowy** - punktem wyjścia jest równe zużycie w każdym
+  kwadransie. Odbiorca, którego pobór już dziś skupia się w południe, zyska mniej niż 21,6%,
+  bo część taniej energii ma w koszyku od początku.
 - **Dwa lata to za mało na tezę o trendzie.** Porównanie rok do roku obejmuje dwa porównywalne
   okna - to jedna obserwacja zgodna z przewidywaniem, a nie jego dowód.
 - **Zależność OZE-cena jest wyjaśniająca, nie prognostyczna.** Zasób `his-wlk-cal` jest
